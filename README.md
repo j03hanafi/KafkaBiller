@@ -22,3 +22,6 @@ Build and Execute the Program
 go build {program_name}
 ./{program_name}
 ```
+
+## Preparation
+Make sure to add ```storage/request/``` and ```storage/response/``` directory to store request/response ISO file
