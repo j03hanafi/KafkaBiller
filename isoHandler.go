@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/mofax/iso8583"
-	"github.com/rivo/uniseg"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/mofax/iso8583"
+	"github.com/rivo/uniseg"
 )
 
 // Handle all ISO Client request

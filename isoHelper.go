@@ -1,64 +1,68 @@
 package main
 
 import (
-	"github.com/go-yaml/yaml"
-	"github.com/mofax/iso8583"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/go-yaml/yaml"
+	"github.com/mofax/iso8583"
 )
 
 // Any helper to process ISO data
 // converter, formatter, etc
 
 // Convert JSON data to ISO8583 format
-func convertIso(transaction Transaction) iso8583.IsoStruct {
+func convertIso(data PaymentResponse) iso8583.IsoStruct {
 
 	log.Println("Converting JSON to ISO8583")
 
-	cardAcceptorTerminalId := transaction.CardAcceptorData.CardAcceptorTerminalId
-	cardAcceptorName := transaction.CardAcceptorData.CardAcceptorName
-	cardAcceptorCity := transaction.CardAcceptorData.CardAcceptorCity
-	cardAcceptorCountryCode := transaction.CardAcceptorData.CardAcceptorCountryCode
+	cardAcceptorTerminalId := data.TransactionData.CardAcceptorData.CardAcceptorTerminalId
+	cardAcceptorName := data.TransactionData.CardAcceptorData.CardAcceptorName
+	cardAcceptorCity := data.TransactionData.CardAcceptorData.CardAcceptorCity
+	cardAcceptorCountryCode := data.TransactionData.CardAcceptorData.CardAcceptorCountryCode
+	responseStatus := convResp(data.ResponseStatus)
 
-	if len(transaction.CardAcceptorData.CardAcceptorTerminalId) < 16 {
-		cardAcceptorTerminalId = rightPad(transaction.CardAcceptorData.CardAcceptorTerminalId, 16, " ")
+	if len(data.TransactionData.CardAcceptorData.CardAcceptorTerminalId) < 16 {
+		cardAcceptorTerminalId = rightPad(data.TransactionData.CardAcceptorData.CardAcceptorTerminalId, 16, " ")
 	}
-	if len(transaction.CardAcceptorData.CardAcceptorName) < 25 {
-		cardAcceptorName = rightPad(transaction.CardAcceptorData.CardAcceptorName, 25, " ")
+	if len(data.TransactionData.CardAcceptorData.CardAcceptorName) < 25 {
+		cardAcceptorName = rightPad(data.TransactionData.CardAcceptorData.CardAcceptorName, 25, " ")
 	}
-	if len(transaction.CardAcceptorData.CardAcceptorCity) < 13 {
-		cardAcceptorCity = rightPad(transaction.CardAcceptorData.CardAcceptorCity, 13, " ")
+	if len(data.TransactionData.CardAcceptorData.CardAcceptorCity) < 13 {
+		cardAcceptorCity = rightPad(data.TransactionData.CardAcceptorData.CardAcceptorCity, 13, " ")
 	}
-	if len(transaction.CardAcceptorData.CardAcceptorCountryCode) < 2 {
-		cardAcceptorCountryCode = rightPad(transaction.CardAcceptorData.CardAcceptorCountryCode, 2, " ")
+	if len(data.TransactionData.CardAcceptorData.CardAcceptorCountryCode) < 2 {
+		cardAcceptorCountryCode = rightPad(data.TransactionData.CardAcceptorData.CardAcceptorCountryCode, 2, " ")
 	}
 	cardAcceptor := cardAcceptorName + cardAcceptorCity + cardAcceptorCountryCode
 
 	trans := map[int64]string{
-		2:  transaction.Pan,
-		3:  transaction.ProcessingCode,
-		4:  strconv.Itoa(transaction.TotalAmount),
-		5:  transaction.SettlementAmount,
-		6:  transaction.CardholderBillingAmount,
-		7:  transaction.TransmissionDateTime,
-		9:  transaction.SettlementConversionRate,
-		10: transaction.CardHolderBillingConvRate,
-		11: transaction.Stan,
-		12: transaction.LocalTransactionTime,
-		13: transaction.LocalTransactionDate,
-		17: transaction.CaptureDate,
-		18: transaction.CategoryCode,
-		22: transaction.PointOfServiceEntryMode,
-		37: transaction.Refnum,
+		2:  data.TransactionData.Pan,
+		3:  data.TransactionData.ProcessingCode,
+		4:  strconv.Itoa(data.TransactionData.TotalAmount),
+		5:  data.TransactionData.SettlementAmount,
+		6:  data.TransactionData.CardholderBillingAmount,
+		7:  data.TransactionData.TransmissionDateTime,
+		9:  data.TransactionData.SettlementConversionRate,
+		10: data.TransactionData.CardHolderBillingConvRate,
+		11: data.TransactionData.Stan,
+		12: data.TransactionData.LocalTransactionTime,
+		13: data.TransactionData.LocalTransactionDate,
+		17: data.TransactionData.CaptureDate,
+		18: data.TransactionData.CategoryCode,
+		22: data.TransactionData.PointOfServiceEntryMode,
+		37: data.TransactionData.Refnum,
+		39: responseStatus,
 		41: cardAcceptorTerminalId,
 		43: cardAcceptor,
-		48: transaction.AdditionalData,
-		49: transaction.Currency,
-		50: transaction.SettlementCurrencyCode,
-		51: transaction.CardHolderBillingCurrencyCode,
-		57: transaction.AdditionalDataNational,
+		48: data.TransactionData.AdditionalData,
+		49: data.TransactionData.Currency,
+		50: data.TransactionData.SettlementCurrencyCode,
+		51: data.TransactionData.CardHolderBillingCurrencyCode,
+		57: data.TransactionData.AdditionalDataNational,
 	}
 
 	one := iso8583.NewISOStruct("spec1987.yml", false)
@@ -139,4 +143,10 @@ func rightPad(s string, length int, pad string) string {
 	}
 	padding := strings.Repeat(pad, length-len(s))
 	return s + padding
+}
+
+func convResp(resp Response) string {
+	response := fmt.Sprintf("%d%d%s", resp.ResponseCode, resp.ReasonCode, resp.ResponseDescription)
+	res := len(response)
+	return fmt.Sprintf("%d%s", res, response)
 }

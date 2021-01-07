@@ -6,16 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 // Handle all JSON Client request
 
 // Send request to mock server in JSON format
 // Get response from mock server in JSON format
-func responseJson(jsonIso Transaction) Transaction {
+func responseJson(jsonIso Transaction) PaymentResponse {
 	var response PaymentResponse
-	var transaction Transaction
 
 	// Initiate request body
 	requestBody, err := json.Marshal(jsonIso)
@@ -24,10 +22,7 @@ func responseJson(jsonIso Transaction) Transaction {
 	}
 
 	// Client setup for custom http request
-	timeout := 5 * time.Second
-	client := http.Client{
-		Timeout: timeout,
-	}
+	client := &http.Client{}
 
 	log.Printf("Request to https://tiruan.herokuapp.com/biller\n")
 
@@ -53,7 +48,6 @@ func responseJson(jsonIso Transaction) Transaction {
 	json.Unmarshal(body, &response)
 
 	// Get transactionData from mock server response
-	transaction = response.TransactionData
 
-	return transaction
+	return response
 }
