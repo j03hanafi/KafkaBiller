@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/mofax/iso8583"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/mofax/iso8583"
 )
 
 // Any helper to process JSON data
