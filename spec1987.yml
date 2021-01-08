@@ -1,13 +1,4 @@
-0:
-  ContentType: "n"
-  Label: Message Type Indicator
-  LenType: fixed
-  MaxLen: 4
-1:
-  ContentType: "b"
-  Label: Bitmap
-  LenType: fixed
-  MaxLen: 8
+
 2:
   ContentType: "n"
   Label: Primary account number (PAN)
@@ -195,10 +186,11 @@
   LenType: fixed
   MaxLen: 6
 39:
-  ContentType: an
-  Label: Response code
-  LenType: fixed
-  MaxLen: 2
+  ContentType: n
+  Label: Response status
+  LenType: lllvar
+  MaxLen: 999
+
 40:
   ContentType: an
   Label: Service restriction code

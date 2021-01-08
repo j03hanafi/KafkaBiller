@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"log"
 	"time"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 // Consume all event occur in selected topic
