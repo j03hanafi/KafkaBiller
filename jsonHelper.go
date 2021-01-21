@@ -20,10 +20,16 @@ func convertIsoToJson(parsedIso iso8583.IsoStruct) Transaction {
 	emap := parsedIso.Elements.GetElements()
 
 	// Format padded CardAcceptor data
-	cardAcceptorTerminalId := strings.TrimRight(emap[41], " ")
-	cardAcceptorName := strings.TrimRight(emap[43][:25], " ")
-	cardAcceptorCity := strings.TrimRight(emap[43][25:38], " ")
-	cardAcceptorCountryCode := strings.TrimRight(emap[43][38:], " ")
+	if emap[43]!=""{
+		cardAcceptorTerminalId := strings.TrimRight(emap[41], " ")
+		cardAcceptorName := strings.TrimRight(emap[43][:25], " ")
+		cardAcceptorCity := strings.TrimRight(emap[43][25:38], " ")
+		cardAcceptorCountryCode := strings.TrimRight(emap[43][38:], " ")
+		response.CardAcceptorData.CardAcceptorTerminalId = cardAcceptorTerminalId
+		response.CardAcceptorData.CardAcceptorName = cardAcceptorName
+		response.CardAcceptorData.CardAcceptorCity = cardAcceptorCity
+		response.CardAcceptorData.CardAcceptorCountryCode = cardAcceptorCountryCode
+	}
 
 	// Map ISO8583 format to JSON data
 	response.Pan = emap[2]
@@ -41,10 +47,6 @@ func convertIsoToJson(parsedIso iso8583.IsoStruct) Transaction {
 	response.CategoryCode = emap[18]
 	response.PointOfServiceEntryMode = emap[22]
 	response.Refnum = emap[37]
-	response.CardAcceptorData.CardAcceptorTerminalId = cardAcceptorTerminalId
-	response.CardAcceptorData.CardAcceptorName = cardAcceptorName
-	response.CardAcceptorData.CardAcceptorCity = cardAcceptorCity
-	response.CardAcceptorData.CardAcceptorCountryCode = cardAcceptorCountryCode
 	response.AdditionalData = emap[48]
 	response.Currency = emap[49]
 	response.SettlementCurrencyCode = emap[50]
