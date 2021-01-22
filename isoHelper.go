@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -15,7 +16,9 @@ import (
 // converter, formatter, etc
 
 // Convert JSON data to ISO8583 format
-func convertIso(data PaymentResponse) iso8583.IsoStruct {
+
+func convertJsonToIso(transaction Transaction) iso8583.IsoStruct {
+
 
 	log.Println("Converting JSON to ISO8583")
 
@@ -90,12 +93,24 @@ func convertIso(data PaymentResponse) iso8583.IsoStruct {
 
 		one.AddField(field, data)
 
-		log.Printf("Field[%s]: %s (%v)", strconv.Itoa(int(field)), data, fieldSpec.Label)
-
 	}
 
+	printSortedDE(one)
 	log.Println("Convert Success")
 	return one
+}
+
+// Log sorted converted ISO Message
+func printSortedDE(parsedMessage iso8583.IsoStruct) {
+	dataElement := parsedMessage.Elements.GetElements()
+	int64toSort := make([]int, 0, len(dataElement))
+	for key := range dataElement {
+		int64toSort = append(int64toSort, int(key))
+	}
+	sort.Ints(int64toSort)
+	for _, key := range int64toSort {
+		log.Printf("[%v] : %v\n", int64(key), dataElement[int64(key)])
+	}
 }
 
 // Spec contains a structured description of an iso8583 spec

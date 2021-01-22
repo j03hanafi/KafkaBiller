@@ -102,8 +102,8 @@ func responseIso(message string) {
 	// Send JSON data to mock server
 	serverResp := responseJson(jsonIso)
 
-	// Conver response from JSON data to ISO8583 format
-	isoParsed := convertIso(serverResp)
+	// Convert response from JSON data to ISO8583 format
+	isoParsed := convertJsonToIso(serverResp)
 
 	// Change MTI response
 	isoParsed.AddMTI("0210")

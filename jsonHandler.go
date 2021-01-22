@@ -24,6 +24,7 @@ func responseJson(jsonIso Transaction) PaymentResponse {
 	// Client setup for custom http request
 	client := &http.Client{}
 
+
 	log.Printf("Request to https://tiruan.herokuapp.com/biller\n")
 
 	// Request to mock server
